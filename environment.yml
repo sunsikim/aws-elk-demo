@@ -1,0 +1,8 @@
+name: awselk
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip>=19.0
+  - typer
+  - boto3
