@@ -1,6 +1,7 @@
 import boto3
 import pathlib
 import config
+import preprocess
 import logging
 import aws.ec2 as ec2_commands
 import aws.vpc as vpc_commands
@@ -90,7 +91,7 @@ def create_workspace_environment(profile_name: str = typer.Argument(...)):
 
 
 @app.command("instance")
-def manage_instance(profile_name: str = typer.Argument(...), action_type: str = typer.Argument(...)):
+def manage_instance(action_type: str = typer.Argument(...), profile_name: str = typer.Argument(...)):
     session = boto3.Session(
         profile_name=profile_name, 
         region_name=config.REGION_NAME,
@@ -183,6 +184,15 @@ def delete_workspace_environment(profile_name: str = typer.Argument(...)):
         ec2_client=ec2_client,
         vpc_name=config.VPC_NAME,
     )
+
+
+@app.command("preprocess")
+def prepare_example_data():
+    logger.info("Download iris data from source")
+    preprocess.download_data()
+
+    logger.info("Transform data into Elasticsearch compatible format")
+    preprocess.preprocess_data()
 
 
 if __name__ == "__main__":

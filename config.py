@@ -12,3 +12,6 @@ KEY_NAME = "awselk"
 INSTANCE_NAME = "elk-server"
 INSTANCE_TYPE = "t2.medium"
 INSTANCE_AMI = "ami-04341a215040f91bb"  # ami of x86 ubuntu image
+
+DATA_URL = "https://archive.ics.uci.edu/static/public/53/iris.zip"
+ARCHIVE_NAME = DATA_URL.split("/")[-1]
