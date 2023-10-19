@@ -67,7 +67,7 @@ def create_workspace_environment(profile_name: str = typer.Argument(...)):
         rt_name=config.ROUTE_TABLE_NAME,
     )
 
-    logger.info("Create EC2 instance")
+    logger.info("Create EC2 instance within defined subnet")
     ec2_commands.create_key_pair(
         ec2_client=ec2_client,
         key_name=config.KEY_NAME,
