@@ -6,7 +6,7 @@
     1. [Launch Kibana](#launch-kibana)
 1. [CRUD in Elasticsearch](#elasticsearch-crud)
     1. [CRUD by Document](#crud-by-document)
-    1. [CRUD by Bulk](#crud-by-bulk)
+    1. [Bulk API](#bulk-api)
 
 ## AWS EC2 Setup
 
@@ -318,14 +318,33 @@ If document is deleted, value of `found` field in result of `GET` request should
 }
 ```
 
-#### Delete index
+### Bulk API
+
+Bulk API lets user to execute multiple create(or indexing), update, delete operations can be done in single API call. Command to create multiple documents should look like this. Note that bulk request should always end with blank line change character.
 
 ```
-DELETE users
+POST users/_bulk
+{"index": {"_id": "1"}}
+{"name" : "Admin Kim", "hobby" : "Elasticsearch", "age" : 26}
+{"index": {"_id": "2"}}
+{"name" : "Admin Park", "hobby" : "Kibana", "age" : 28}
+{"index": {"_id": "3"}}
+{"name" : "Admin Lee", "hobby" : "Logstash", "age" : 24}
+{"index": {"_id": "4"}}
+{"name" : "Admin Song", "hobby" : "Filebeat", "age" : 30}
+
 ```
 
-### CRUD by Bulk
+Different operations can be mixed into single bulk API request as below.
 
+```
+POST users/_bulk
+{"update": {"_id": "1"}}
+{"doc": {"age": 27}}
+{"delete": {"_id": "3"}}
+{"delete": {"_id": "2"}}
+
+```
 
 ---
 
