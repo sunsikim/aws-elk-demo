@@ -5,6 +5,8 @@
     1. [Launch Elasticsearch](#launch-elasticsearch)
     1. [Launch Kibana](#launch-kibana)
 1. [CRUD in Elasticsearch](#elasticsearch-crud)
+    1. [CRUD by Document](#crud-by-document)
+    1. [CRUD by Bulk](#crud-by-bulk)
 
 ## AWS EC2 Setup
 
@@ -160,10 +162,172 @@ Since type is being removed from from Elasticsearch 7 as explained in [this page
 |RDBMS|Elasticsearch|
 |--|--|
 |Table|Index|
-|Row|Docuemnt|
+|Row|Document|
 |Column|Feature|
 |Schema|Mapping|
 
+### CRUD by Document
+
+Get into `Dev Tools` page to see this blank console where you will be typing commands presented in this demo. 
+
+![kibana-devtools](https://raw.githubusercontent.com/sunsikim/aws-elk-demo/master/images/kibana-devtools.png "Devtools page")
+
+#### Elasticsearch health check
+
+```
+GET _cat/health?v
+```
+
+#### Create index
+
+```
+PUT users
+```
+
+If `users` index is created successfully, result of following command
+
+```
+GET _cat/indices?v
+```
+
+should look like this:
+
+```
+health status index                uuid                   
+yellow open   users                c1R3jf0YQSuKGZcNYkbvAg 
+green  open   .kibana_task_manager sQlT2F4jRfi5z3Ai94TS0Q 
+green  open   .kibana_1            LO9tWZ2ZQtexUcPe0YRFhw 
+```
+
+#### Create document
+
+This command will create document whose `_id` is 1.
+
+```
+POST users/_doc/1
+{
+  "name": "Admin Kim",
+  "hobby": "Elasticsearch",
+  "age": 26
+}
+```
+
+#### Read document
+
+This command will fetch information of document whose `_id` is 1.
+
+```
+GET users/_doc/1
+```
+
+If document was created successfully, result should look like this:
+
+```
+{
+  "_index" : "users",
+  "_type" : "_doc",
+  "_id" : "1",
+  "_version" : 1,
+  "_seq_no" : 0,
+  "_primary_term" : 1,
+  "found" : true,
+  "_source" : {
+    "name" : "Admin Kim",
+    "hobby" : "Elasticsearch",
+    "age" : 26
+  }
+}
+```
+
+#### Update document
+
+This command updates existing value of a document whose `_id` is 1
+
+```
+POST users/_update/1/
+{
+  "doc": {
+    "name": "Admin Park"
+  }
+}
+```
+
+After executing this command, result of `GET` request on the same document should look like this. Note that value of `_version` increased from 1 to 2.
+
+```
+{
+  "_index" : "users",
+  "_type" : "_doc",
+  "_id" : "1",
+  "_version" : 2,
+  "_seq_no" : 1,
+  "_primary_term" : 1,
+  "found" : true,
+  "_source" : {
+    "name" : "Admin Park",
+    "hobby" : "Elasticsearch",
+    "age" : 26
+  }
+}
+```
+
+You would like to define how you would like to update as a function. In this case, you can use Javascript syntax within script source as below.
+
+```
+POST users/_update/1/
+{
+  "script": {
+    "source": "if(ctx._source.age < 100) {ctx._source.age++}"
+  }
+}
+```
+
+Result of same `GET` request on this user should look like this. As expected, since age of the user did not exceed 100, its age got incremented from 26 to 27.
+
+```
+{
+  "_index" : "users",
+  "_type" : "_doc",
+  "_id" : "1",
+  "_version" : 3,
+  "_seq_no" : 2,
+  "_primary_term" : 1,
+  "found" : true,
+  "_source" : {
+    "name" : "Admin Park",
+    "hobby" : "Elasticsearch",
+    "age" : 27
+  }
+}
+```
+
+#### Delete document
+
+```
+DELETE users/_doc/1
+```
+
+If document is deleted, value of `found` field in result of `GET` request should be `false`.
+
+```
+{
+  "_index" : "users",
+  "_type" : "_doc",
+  "_id" : "1",
+  "found" : false
+}
+```
+
+#### Delete index
+
+```
+DELETE users
+```
+
+### CRUD by Bulk
+
+
+---
 
 Since Python3 and git are pre-installed in Ubuntu 20.04, just clone the current repository into the instance to have codes to download example dataset to work with from [this link](https://archive.ics.uci.edu/dataset/53/iris).
 
