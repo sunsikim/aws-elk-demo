@@ -25,7 +25,7 @@ def preprocess_data():
     documents = []
     for idx, iris in enumerate(iris_data):
         # Note from Elasticsearch error message : The bulk request must be terminated by a newline [\\n]
-        document = '{"index": {"_index": "datasets", "_type": "iris", "_id": "%s"}}\n' % idx
+        document = '{"index": {"_index": "iris", "_id": "%s"}}\n' % idx
         documents.append(document)
 
         sl, sw, pl, pw, iris_type = iris.split(",")
@@ -35,17 +35,3 @@ def preprocess_data():
 
     with open(data_dir.joinpath("iris_data.json"), "w") as file:
         file.writelines("".join(documents))
-     
-    with open(data_dir.joinpath("iris_mapping.json"), "w") as file:
-        mapping = {
-            "iris": {
-                "properties": {
-                    "sepal_length": {"type": "float"},
-                    "sepal_width": {"type": "float"},
-                    "petal_length": {"type": "float"},
-                    "petal_width": {"type": "float"},
-                    "class": {"type": "string"},
-                }
-            } 
-        }
-        file.write(json.dumps(mapping))
