@@ -4,9 +4,12 @@
 1. [ELK Installation on Ubuntu Instance](#elk-installation-on-ec2-instance)
     1. [Launch Elasticsearch](#launch-elasticsearch)
     1. [Launch Kibana](#launch-kibana)
-1. [CRUD in Elasticsearch](#elasticsearch-crud)
-    1. [CRUD by Document](#crud-by-document)
+1. [CRUD in Elasticsearch](#crud-in-elasticsearch)
+    1. [CRUD by document](#crud-by-document)
     1. [Bulk API](#bulk-api)
+1. [Elasticsearch Query DSL](#elasticsearch-query-dsl)
+    1. [Insert example data from file](#insert-example-data-from-file)
+    1. [Send JSON query](#send-json-query)
 
 ## AWS EC2 Setup
 
@@ -166,7 +169,7 @@ Since type is being removed from from Elasticsearch 7 as explained in [this page
 |Column|Feature|
 |Schema|Mapping|
 
-### CRUD by Document
+### CRUD by document
 
 Get into `Dev Tools` page to see this blank console where you will be typing commands presented in this demo. 
 
@@ -346,9 +349,13 @@ POST users/_bulk
 
 ```
 
----
+## Elasticsearch Query DSL
 
-Since Python3 and git are pre-installed in Ubuntu 20.04, just clone the current repository into the instance to have codes to download example dataset to work with from [this link](https://archive.ics.uci.edu/dataset/53/iris).
+It is time to insert real data and make some queries on it. This repository provides code to download iris dataset from [source](https://archive.ics.uci.edu/dataset/53/iris) in `preprocess.py`. 
+
+### Insert example data from file
+
+Since Python3 and git are pre-installed in Ubuntu 20.04, just clone the current repository into the instance to have codes to download the dataset.
 
 ```
 sudo apt install -y python3-pip
@@ -366,19 +373,14 @@ Execute logics implemented in `preprocess.py` by using following command
 python main.py preprocess
 ```
 
-## Create index and insert data
-
-In short, there are three steps to follow.
-
-1. Create **type** within **index**.
-1. Define **mapping** of created **type**.
-1. Insert data using POST request with `bulk` option.
+Then, create `iris` index and insert preprocessed data using POST request with `bulk` API.
 
 ```
-curl -XPUT localhost:9200/datasets?pretty
-curl -XPOST localhost:9200/datasets/iris/_bulk?pretty \
+curl -XPUT 127.0.0.1:9200/iris?pretty
+curl -XPOST 127.0.0.1:9200/iris/_bulk?pretty \
     -H 'Content-Type: application/json' \
     --data-binary @data/iris_data.json
-curl -XGET localhost:9200/datasets/iris/0?pretty  # check if data is inserted properly
-
+curl -XGET 127.0.0.1:9200/iris/_doc/0?pretty  # check if data is inserted properly
 ```
+
+### Send JSON query
